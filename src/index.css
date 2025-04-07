@@ -1,58 +1,60 @@
-.app{
-    margin :0;
-    padding : 40;
+.container {
+    width: 500px;
+    margin: auto;  /* Center the board */
+    border-radius: 4px;
     display: flex;
-    justify-content:center;
-   
-    align-items:center;
-    height:300vh;
-    flex-direction:column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    white-space: 10px;
+}
+.player
+{
+  font-size:24px;
+  font-weight:bold;
+  text-align:center;
 
 }
-.gameboard{
-    width :300px;
-    height :300px;
-    display :flex;
-    
-    flex-wrap:wrap;
-    border:solid 1px black;
 
+.one
+{
+  margin:10px;
+  padding: 10px;
+  background-color: aliceblue;
+  border-radius: 4px;
+  font-size:18px;
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
-.square{
-    width:100px;
-    height:100px;
-    border:solid 2px black;
-    position:center;
-    box-sizing: border-box;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+.style
+{
+  display:flex;
+  justify-content:center;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+
+  
 }
-.circle{
-    height : 70px;
-    width: 100px;
-    border-radius: 50%;
-    border: 15px solid blue;
-}
-.cross {
-    position: relative;
-    width: 80px;
-    height: 80px;
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 10vh; /* full screen height */
+  gap: 10px; /* spacing between input and button */
 }
 
-.cross::before,
-.cross::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 10px;
-    height: 100%;
-    background-color: red;
-    transform:  rotate(45deg);
+.game {
+  width: 250px;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+}
+.button
+{
+  border-radius:3px;
+  background-color: antiquewhite;
 }
 
-.cross::after {
-    transform: rotate(-45deg);
-}
+
+
 

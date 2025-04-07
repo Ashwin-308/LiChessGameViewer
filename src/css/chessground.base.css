@@ -1,0 +1,82 @@
+.cg-wrap {
+  box-sizing: border-box;  /* Changed from content-box */
+  position: relative;
+  display: block;
+  width: 100px;  /* Set explicit width */
+  height: 100px;
+  margin: auto;
+}
+
+cg-container {
+  position: absolute;
+  width: 10%;  /* Use full width of .cg-wrap */
+  height: 10%;
+  display: block;
+  top: 0;
+}
+
+cg-board {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10%;  /* Match container */
+  height: 10%;
+  user-select: none;
+  background-size: cover;
+}
+
+/* Fix piece size */
+cg-board square, 
+.cg-wrap piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12.5%; /* Each square should be 1/8th of board size */
+  height: 12.5%;
+}
+
+/* Ensure dragging pieces don't break layout */
+cg-board piece.dragging {
+  cursor: move;
+  z-index: 11 !important;
+}
+
+/* Restrict auto-generated pieces & shapes */
+.cg-wrap cg-auto-pieces,
+.cg-wrap .cg-shapes,
+.cg-wrap .cg-custom-svgs {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10%;
+  height: 10%;
+  pointer-events: none;
+}
+
+/* Coordinates adjustments */
+.cg-wrap coords {
+  position: absolute;
+  display: flex;
+  pointer-events: none;
+  opacity: 0.8;
+  font-family: sans-serif;
+  font-size: 14px;  /* Increased for better visibility */
+}
+
+.cg-wrap coords.ranks {
+  left: 4px;
+  top: -15px;
+  flex-flow: column-reverse;
+  height: 10%;
+  width: 20px;
+}
+
+.cg-wrap coords.files {
+  bottom: -5px;
+  left: 20px;
+  flex-flow: row;
+  width: 10%;
+  height: 20px;
+  text-transform: uppercase;
+  text-align: center;
+}
