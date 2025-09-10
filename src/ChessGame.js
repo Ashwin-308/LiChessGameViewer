@@ -10,11 +10,11 @@ function LichessGamePlayer() {
   const [currentMove, setCurrentMove] = useState(0);
   const [playerInfo, setPlayerInfo] = useState(null);
   const [gameStatus, setGameStatus] = useState(null);
-  const [evaluation,setevaluation] = useState(null);
+
   const [op,newop] = useState("Unknown");
   const [whiteAccuracy, setWhiteAccuracy] = useState("N/A");
  const [blackAccuracy, setBlackAccuracy] = useState("N/A");
-
+const [evaldata,seteval] = useState(null);
 
   const fetchGame = async () => {
     try {
@@ -48,12 +48,16 @@ function LichessGamePlayer() {
         console.log("Not found");
       }
       setCurrentMove(0);
-      if(data.moves)
-      {
-        fetcheval(data.id);
-      }
-
-      
+      const chess = new Chess();
+      newMoves.forEach(move => {
+        try {
+          chess.move(move);
+        } catch (error) {   
+          console.error("Invalid move skipped:", move, error);
+        }
+      });
+     const fen = chess.fen();
+     fetcheval(fen);
       return newMoves;
     } catch (error) {
       console.error("Error fetching game:", error);
@@ -61,6 +65,7 @@ function LichessGamePlayer() {
       return null;
     }
   };
+ 
 
   const fetchPlayerInfo = async () => {
     try {
@@ -72,46 +77,7 @@ function LichessGamePlayer() {
       console.error("Error fetching player info:", error);
     }
   };
-  const fetcheval = async (id) => {
-    try {
-      const response = await fetch(
-        `https://lichess.org/game/export/${id}?evals=true&pgnInJson=true&accuracy=1`,
-        {
-          headers: { 'Accept': 'application/json' }
-        }
-      );
   
-      if (!response.ok) throw new Error("Failed to fetch game evaluation");
-  
-      const data = await response.json();
-      console.log("Game Data:", data);
-  
-      // Extract evaluations
-      if (data.analyses && data.analyses.length > 0) {
-        const lastEval = data.analyses[data.analyses.length - 1]?.eval;
-        setevaluation(lastEval !== undefined ? lastEval : "N/A");
-      } else {
-        setevaluation("N/A");
-      }
-  
-      // Extract accuracy for both players
-      if (data.accuracy) {
-        const whiteAccuracy = data.accuracy.white || "N/A";
-        const blackAccuracy = data.accuracy.black || "N/A";
-  
-        console.log(`White Accuracy: ${whiteAccuracy}, Black Accuracy: ${blackAccuracy}`);
-  
-        setWhiteAccuracy(whiteAccuracy);
-        setBlackAccuracy(blackAccuracy);
-      } else {
-        setWhiteAccuracy("N/A");
-        setBlackAccuracy("N/A");
-      }
-  
-    } catch (error) {
-      console.error("Error fetching evaluation:", error);
-    }
-  };
   
   useEffect(() => {
     fetchPlayerInfo();
@@ -165,28 +131,41 @@ function LichessGamePlayer() {
       default: return "Error";
     }
   };
-  
+  const fetcheval = async (fen) => {
+      try {
+        const response = await fetch(`https://stockfish.online/api/s/v2.php?fen=${encodeURIComponent(fen)}&depth=15`);
+        if (!response.ok) throw new Error("Failed to fetch evaluation");
+        const evaldata = await response.json();
+        seteval(evaldata);
+        console.log(evaldata);
+      console.log("Evaluation Data:", evaldata);
+    }catch(error)
+    {
+      console.error("Error fetching evaluation:", error);
+    }
+  };
+        
+
+
 
   return (
     <div>
       {playerInfo && (
         <div >
           <h2 className = "player">Player: {playerInfo?.username}</h2>
-          <p className = "one">Blitz Rating: {playerInfo?.perfs?.blitz?.rating || "N/A"}</p>
-          <p className = "one"> Rapid Rating: {playerInfo?.perfs?.bullet?.rating || "N/A"}</p>
+          <p className = "one">Blitz Ratin: {playerInfo?.perfs?.blitz?.rating || "N/A"}</p>
+          <p className = "one"> Bullet Rating: {playerInfo?.perfs?.bullet?.rating || "N/A"}</p>
           <p className = "one">Games Played: {playerInfo?.count?.all || "N/A"}</p>
           <p className = "one">Opening : {op}</p>
-          <p className = "one">Accuracy : {whiteAccuracy}</p>
-          <p className = "one">Accuracy : {blackAccuracy}</p>
+          <p className = "one">Evaluation : {evaldata?.evaluation}</p>
+          <p className = "one">Best Continuation :{evaldata?.bestmove}</p>
           
         </div>
       )}
       <div className="one">
         Status: {formatGameStatus(gameStatus)}
       </div>
-      <div className = "one">
-        Evaluation : {evaluation !== null ? evaluation : "Loading"}
-      </div>
+     
       <div className="container">
         <Chessboard position={game.fen()} />
       </div>
@@ -194,4 +173,4 @@ function LichessGamePlayer() {
   );
 }
 
-export default LichessGamePlayer;
+export default LichessGamePlayer
