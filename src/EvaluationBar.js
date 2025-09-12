@@ -1,11 +1,12 @@
 function EvaluationBar({value}) {
 const evalclamp = Math.max(-10,Math.min(10,value));
 const percent =  ((evalclamp +10)/20) * 100;
+const revpercent = 100-percent;
   return (
     <div style={{
       width: '30px',
       height: '500px',
-      background: 'linear-gradient(to top, #222 0%, #fff 100%)',
+      background: 'grey',
       borderRadius: '8px',
       borderColor: 'black',
       borderWidth: '5px',
@@ -13,15 +14,22 @@ const percent =  ((evalclamp +10)/20) * 100;
       position: 'relative',
       marginLeft: '16px'
     }}>
-      <div style={{
-        position: 'absolute',
+      
+      <div style = {{
+        position: 'relative',
         left: 0,
-        bottom: 0,
         width: '100%',
-        height: `${percent}%`,
-        background: evalclamp >= 0 ? '#fff' : '#222',
-        borderRadius: '8px'
-      }} />
+        height :`${percent}%`,
+        background:'#fff'
+      }}/>
+      <div style = {{
+        position: 'relative',
+       
+        left: 0,
+        width: '100%',
+        height :`${revpercent}%`,
+        background:'black'
+      }}/>
       <div style={{
         position: 'absolute',
         top: '50%',
