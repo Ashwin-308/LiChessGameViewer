@@ -51,10 +51,31 @@
 }
 .button
 {
-  border-radius:3px;
-  background-color: antiquewhite;
+ 
+  border-radius: 30px;
+  background-color: lime;
+  font-size: 16px;      /* Increase text size */
+  padding: 10px 20px;   /* Increase button size */
+  width: auto;          /* Let width adjust to content */
+  height: auto;         /* Let height adjust to content */
 }
 
-
-
+.button-row{
+  margin-top:30px;
+  display: flex;
+  gap:12px;
+  justify-content:center;
+  
+  
+}
+.eval-row
+{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.two{
+  justify-content: center;
+  align-items:center
+}
 

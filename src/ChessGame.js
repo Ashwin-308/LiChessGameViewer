@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import {useParams} from 'react-router-dom';
-
+import EvaluationBar from "./EvaluationBar";
 function LichessGamePlayer() {
   const {username} = useParams();
   const [game, setGame] = useState(new Chess());
@@ -10,10 +10,10 @@ function LichessGamePlayer() {
   const [currentMove, setCurrentMove] = useState(0);
   const [playerInfo, setPlayerInfo] = useState(null);
   const [gameStatus, setGameStatus] = useState(null);
+  const [showeval,setshoweval] = useState(false);
 
   const [op,newop] = useState("Unknown");
-  const [whiteAccuracy, setWhiteAccuracy] = useState("N/A");
- const [blackAccuracy, setBlackAccuracy] = useState("N/A");
+  
 const [evaldata,seteval] = useState(null);
 
   const fetchGame = async () => {
@@ -39,6 +39,10 @@ const [evaldata,seteval] = useState(null);
       }
       
       const newMoves = data.moves.split(' ');
+      const chess = new Chess();
+      newMoves.forEach(move => {chess.move(move);});
+      setGame(chess);
+      fetcheval(chess.fen());
       setMoves(newMoves);
       if(data.opening)
       {
@@ -48,16 +52,7 @@ const [evaldata,seteval] = useState(null);
         console.log("Not found");
       }
       setCurrentMove(0);
-      const chess = new Chess();
-      newMoves.forEach(move => {
-        try {
-          chess.move(move);
-        } catch (error) {   
-          console.error("Invalid move skipped:", move, error);
-        }
-      });
-     const fen = chess.fen();
-     fetcheval(fen);
+      
       return newMoves;
     } catch (error) {
       console.error("Error fetching game:", error);
@@ -92,15 +87,18 @@ const [evaldata,seteval] = useState(null);
     return () => clearInterval(intervalId);
   }, [username, gameStatus]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (gameStatus !== "started") return;
 
     if (currentMove < moves.length) {
+      console.log("Current Move Index:", currentMove);
+      console.log("Moves in array:", moves.length);
       const timer = setTimeout(() => {
         setGame((prevGame) => {
           const newGame = new Chess(prevGame.fen());
           try {
             newGame.move(moves[currentMove]);
+            fetcheval(newGame.fen());
             return newGame;
           } catch (error) {
             console.error("Invalid move skipped:", moves[currentMove], error);
@@ -119,7 +117,7 @@ const [evaldata,seteval] = useState(null);
       
       return () => clearTimeout(refreshTimer);
     }
-  }, [currentMove, moves, gameStatus]);
+  }, [currentMove, moves, gameStatus]);*/
 
   const formatGameStatus = (status) => {
     switch (status) {
@@ -145,31 +143,67 @@ const [evaldata,seteval] = useState(null);
     }
   };
         
-
-
+ const gottomove = (moveIndex) => {
+  const chess = new Chess();
+  for(let i = 0;i<moveIndex;i++)
+  {
+    try{
+      chess.move(moves[i]);
+    }catch(error)
+    {
+      console.error("Invalid move skipped:", moves[i], error);
+    }
+  }
+  setGame(chess);
+  fetcheval(chess.fen());
+  setCurrentMove(moveIndex);
+};
 
   return (
     <div>
       {playerInfo && (
         <div >
           <h2 className = "player">Player: {playerInfo?.username}</h2>
-          <p className = "one">Blitz Ratin: {playerInfo?.perfs?.blitz?.rating || "N/A"}</p>
+          <p className = "one">Blitz Rating: {playerInfo?.perfs?.blitz?.rating || "N/A"}</p>
           <p className = "one"> Bullet Rating: {playerInfo?.perfs?.bullet?.rating || "N/A"}</p>
           <p className = "one">Games Played: {playerInfo?.count?.all || "N/A"}</p>
           <p className = "one">Opening : {op}</p>
-          <p className = "one">Evaluation : {evaldata?.evaluation}</p>
+          
           <p className = "one">Best Continuation :{evaldata?.bestmove}</p>
           
         </div>
       )}
+      
       <div className="one">
         Status: {formatGameStatus(gameStatus)}
       </div>
-     
-      <div className="container">
-        <Chessboard position={game.fen()} />
+      <div className = "one">
+          <div className = "eval-row">
+        <button onClick = {() => setshoweval((prev) => !prev)}>{showeval ? "Hide Evaluation" : "Show Evaluation"}</button>
+        {showeval && (<p>Evaluation : {evaldata ?.evaluation}</p>)}
+        </div>
       </div>
+      
+      
+    
+      
+         <div className = "container">
+        <Chessboard position={game.fen()} />
+        <div className = "two"><EvaluationBar value={parseFloat(evaldata?.evaluation)} /></div>
+        
+      </div>
+      
+      
+      
+        <div className = "button-row">
+      <button className = "button"onClick={() => gottomove(currentMove-1)} disabled = {currentMove === 0}>Previous Move</button>
+      <button className = "button"onClick={() => gottomove(currentMove+1)} disabled = {currentMove >= moves.length}>Next Move</button>
+      </div>
+      
+      
+      
     </div>
+    
   );
 }
 
