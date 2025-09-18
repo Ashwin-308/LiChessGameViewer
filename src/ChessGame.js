@@ -11,14 +11,16 @@ function LichessGamePlayer() {
   const [playerInfo, setPlayerInfo] = useState(null);
   const [gameStatus, setGameStatus] = useState(null);
   const [showeval,setshoweval] = useState(false);
-
+  const [bg,setbg] = useState("white");
   const [op,newop] = useState("Unknown");
-  
-const [evaldata,seteval] = useState(null);
+  const [prevcolor,setprecolor] = useState();
+  const [compbg,setcompbg] = useState();
+ 
+const [evaldata,seteval] = useState(null);  
 
   const fetchGame = async () => {
     try {
-      const response = await fetch(`https://lichess.org/api/user/${username}/current-game`, {
+      const response = await fetch(`https://lichess.org/game/export/${username}`, {
         headers: { 'Accept': 'application/json' }
       });
   
@@ -60,9 +62,12 @@ const [evaldata,seteval] = useState(null);
       return null;
     }
   };
- 
-
-  const fetchPlayerInfo = async () => {
+ const changeBg = (color) => {
+  const bgcolor = color=="white"? "#1e0e2a":"white";
+   setbg(bgcolor);
+   changecompbg(bg);
+ }
+ const fetchPlayerInfo = async () => {
     try {
       const response = await fetch(`https://lichess.org/api/user/${username}`);
       if (!response.ok) throw new Error("Failed to fetch player info");
@@ -86,7 +91,6 @@ const [evaldata,seteval] = useState(null);
 
     return () => clearInterval(intervalId);
   }, [username, gameStatus]);
-
   /*useEffect(() => {
     if (gameStatus !== "started") return;
 
@@ -118,7 +122,7 @@ const [evaldata,seteval] = useState(null);
       return () => clearTimeout(refreshTimer);
     }
   }, [currentMove, moves, gameStatus]);*/
-
+ 
   const formatGameStatus = (status) => {
     switch (status) {
       case "started": return "Game in progress ";
@@ -158,26 +162,33 @@ const [evaldata,seteval] = useState(null);
   fetcheval(chess.fen());
   setCurrentMove(moveIndex);
 };
+const changecompbg =  (color) => {
+  const compbgcolor = color =="white" ?"#62b78e":"aliceblue";
+  setcompbg(compbgcolor);
+
+}
 
   return (
-    <div>
+
+    <div style = {{backgroundColor:bg}}>
+      <div>
       {playerInfo && (
         <div >
           <h2 className = "player">Player: {playerInfo?.username}</h2>
-          <p className = "one">Blitz Rating: {playerInfo?.perfs?.blitz?.rating || "N/A"}</p>
-          <p className = "one"> Bullet Rating: {playerInfo?.perfs?.bullet?.rating || "N/A"}</p>
-          <p className = "one">Games Played: {playerInfo?.count?.all || "N/A"}</p>
-          <p className = "one">Opening : {op}</p>
+          <p className = "one" style = {{backgroundColor:compbg}}>Blitz Rating: {playerInfo?.perfs?.blitz?.rating || "N/A"}</p>
+          <p className = "one" style = {{backgroundColor:compbg}}> Bullet Rating: {playerInfo?.perfs?.bullet?.rating || "N/A"}</p>
+          <p className = "one" style = {{backgroundColor:compbg}}>Games Played: {playerInfo?.count?.all || "N/A"}</p>
+          <p className = "one" style = {{backgroundColor:compbg}}>Opening : {op}</p>
           
-          <p className = "one">Best Continuation :{evaldata?.bestmove}</p>
+          <p className = "one" style = {{backgroundColor:compbg}}>Best Continuation :{evaldata?.bestmove}</p>
           
         </div>
       )}
       
-      <div className="one">
+      <div className="one" style = {{backgroundColor:compbg}}>
         Status: {formatGameStatus(gameStatus)}
       </div>
-      <div className = "one">
+      <div className = "one" style = {{backgroundColor:compbg}}>
           <div className = "eval-row">
         <button onClick = {() => setshoweval((prev) => !prev)}>{showeval ? "Hide Evaluation" : "Show Evaluation"}</button>
         {showeval && (<p>Evaluation : {evaldata ?.evaluation}</p>)}
@@ -198,9 +209,10 @@ const [evaldata,seteval] = useState(null);
         <div className = "button-row">
       <button className = "button"onClick={() => gottomove(currentMove-1)} disabled = {currentMove === 0}>Previous Move</button>
       <button className = "button"onClick={() => gottomove(currentMove+1)} disabled = {currentMove >= moves.length}>Next Move</button>
+      <button className = "button" onClick = {() => changeBg(bg)}>Change Background</button>
       </div>
       
-      
+      </div>
       
     </div>
     
