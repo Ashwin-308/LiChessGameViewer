@@ -1,4 +1,4 @@
-import { DotLottie } from "https://esm.sh/@lottiefiles/dotlottie-web";
+import { DotLottie } from "@lottiefiles/dotlottie-web";
 import { useEffect, useRef, useState } from "react";
 
 function GameTracker({isOn,onToggle}) {

@@ -17,7 +17,7 @@ function LichessGamePlayer() {
   const [op,newop] = useState("Unknown");
   const [prevcolor,setprecolor] = useState();
   const [compbg,setcompbg] = useState("aliceblue");
-  const [arrows, setArrows] = useState([ ["e2", "e4"]]);
+  const [arrows, setArrows] = useState([ ["",""]]);
  
 const [evaldata,seteval] = useState(null);  
 
@@ -180,9 +180,13 @@ const changecompbg =  (color) => {
 useEffect(() => {
   let start = null;
   let end = null;
-  const str = evaldata?.bestmove.split(' ')[1];
+  let str = "";
+  if(evaldata){
+   str = evaldata?.bestmove.split(' ')[1];
+  }
   
-  if (evaldata?.bestmove) {
+  
+  if (evaldata?.bestmove && str != undefined) {
     
       start = str.slice(0, 2); 
       end = str.slice(2, 4); 
@@ -202,7 +206,7 @@ useEffect(() => {
       <div>
       {playerInfo && (
         <div >
-          <h2 className = "player" >Player: {playerInfo?.username}</h2>
+          <h2 className = "player" style = {{backgroundColor:compbg}}>Player: {playerInfo?.username}</h2>
           <p className = "one" style = {{backgroundColor:compbg}}>Blitz Rating: {playerInfo?.perfs?.blitz?.rating || "N/A"}</p>
           <p className = "one" style = {{backgroundColor:compbg}}> Bullet Rating: {playerInfo?.perfs?.bullet?.rating || "N/A"}</p>
           <p className = "one" style = {{backgroundColor:compbg}}>Games Played: {playerInfo?.count?.all || "N/A"}</p>
@@ -230,12 +234,8 @@ useEffect(() => {
           customArrows = {arrows}
           
          />
-
-                           
-
-          
-        
-        <div className = "two"><EvaluationBar value={parseFloat(evaldata?.evaluation)} /></div>
+    
+        <div className = "two" style = {{color:bg === "white"?"black":"yellow"}}> <EvaluationBar value={parseFloat(evaldata?.evaluation)} /></div>
         
       </div>
       
