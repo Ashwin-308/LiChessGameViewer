@@ -99,13 +99,13 @@ return(
    
       <div className = "one">Opening : {op}</div>
       <div className = "one">Status : {formatGameStatus(gamestatus)}</div>
-      <div></div>
+      
       <div className = "eval-row">
         <button onClick = {() => setshoweval((prev) => !prev)}>{showeval ? "Hide Evaluation" : "Show Evaluation"}</button>
         {showeval && (<p>Evaluation : {evaldata ?.evaluation}</p>)}
         </div>
          <div className = "container">
-        <Chessboard position={game.fen()} />
+         <Chessboard position={game.fen()} />
         <div className = "two"><EvaluationBar value={parseFloat(evaldata?.evaluation)} /></div>
       </div>
         <div className = "button-row">

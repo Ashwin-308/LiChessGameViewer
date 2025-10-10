@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import {useParams} from 'react-router-dom';
 import EvaluationBar from "./EvaluationBar";
+import GameTracker from "../GameTracker";
+import Celebrations from "../Celebrations";
 function LichessGamePlayer() {
   const {username} = useParams();
   const [game, setGame] = useState(new Chess());
@@ -14,13 +16,15 @@ function LichessGamePlayer() {
   const [bg,setbg] = useState("white");
   const [op,newop] = useState("Unknown");
   const [prevcolor,setprecolor] = useState();
-  const [compbg,setcompbg] = useState();
+  const [compbg,setcompbg] = useState("aliceblue");
+  const [arrows, setArrows] = useState([ ["e2", "e4"]]);
  
 const [evaldata,seteval] = useState(null);  
 
+
   const fetchGame = async () => {
     try {
-      const response = await fetch(`https://lichess.org/game/export/${username}`, {
+      const response = await fetch(`https://lichess.org/api/user/${username}/current-game`, {
         headers: { 'Accept': 'application/json' }
       });
   
@@ -46,6 +50,7 @@ const [evaldata,seteval] = useState(null);
       setGame(chess);
       fetcheval(chess.fen());
       setMoves(newMoves);
+     
       if(data.opening)
       {
        newop(data.opening.name);
@@ -91,6 +96,7 @@ const [evaldata,seteval] = useState(null);
 
     return () => clearInterval(intervalId);
   }, [username, gameStatus]);
+
   /*useEffect(() => {
     if (gameStatus !== "started") return;
 
@@ -122,6 +128,9 @@ const [evaldata,seteval] = useState(null);
       return () => clearTimeout(refreshTimer);
     }
   }, [currentMove, moves, gameStatus]);*/
+
+   
+
  
   const formatGameStatus = (status) => {
     switch (status) {
@@ -167,14 +176,33 @@ const changecompbg =  (color) => {
   setcompbg(compbgcolor);
 
 }
+// Whenever evaluation updates, set an arrow
+useEffect(() => {
+  let start = null;
+  let end = null;
+  const str = evaldata?.bestmove.split(' ')[1];
+  
+  if (evaldata?.bestmove) {
+    
+      start = str.slice(0, 2); 
+      end = str.slice(2, 4); 
+    
+    setArrows([[start, end]]); 
+  }
+   console.log("data",str);
+}, [evaldata]);
+
+
+
 
   return (
 
-    <div style = {{backgroundColor:bg}}>
+    <div style = {{backgroundColor:bg}} className = "celeb" >
+      
       <div>
       {playerInfo && (
         <div >
-          <h2 className = "player">Player: {playerInfo?.username}</h2>
+          <h2 className = "player" >Player: {playerInfo?.username}</h2>
           <p className = "one" style = {{backgroundColor:compbg}}>Blitz Rating: {playerInfo?.perfs?.blitz?.rating || "N/A"}</p>
           <p className = "one" style = {{backgroundColor:compbg}}> Bullet Rating: {playerInfo?.perfs?.bullet?.rating || "N/A"}</p>
           <p className = "one" style = {{backgroundColor:compbg}}>Games Played: {playerInfo?.count?.all || "N/A"}</p>
@@ -184,39 +212,47 @@ const changecompbg =  (color) => {
           
         </div>
       )}
-      
+      </div>
       <div className="one" style = {{backgroundColor:compbg}}>
         Status: {formatGameStatus(gameStatus)}
       </div>
       <div className = "one" style = {{backgroundColor:compbg}}>
           <div className = "eval-row">
-        <button onClick = {() => setshoweval((prev) => !prev)}>{showeval ? "Hide Evaluation" : "Show Evaluation"}</button>
+        <GameTracker isOn = {showeval} onToggle = {setshoweval}/>{showeval ? "Hide Evaluation" : "Show Evaluation"}
         {showeval && (<p>Evaluation : {evaldata ?.evaluation}</p>)}
         </div>
       </div>
-      
-      
-    
+      <div><Celebrations isstatus = {gameStatus}/></div>
       
          <div className = "container">
-        <Chessboard position={game.fen()} />
+        <Chessboard
+          position={game.fen()}
+          customArrows = {arrows}
+          
+         />
+
+                           
+
+          
+        
         <div className = "two"><EvaluationBar value={parseFloat(evaldata?.evaluation)} /></div>
         
       </div>
       
-      
-      
+            <Celebrations isstatus={gameStatus} />
+                    
         <div className = "button-row">
       <button className = "button"onClick={() => gottomove(currentMove-1)} disabled = {currentMove === 0}>Previous Move</button>
       <button className = "button"onClick={() => gottomove(currentMove+1)} disabled = {currentMove >= moves.length}>Next Move</button>
       <button className = "button" onClick = {() => changeBg(bg)}>Change Background</button>
       </div>
       
-      </div>
+      
       
     </div>
     
   );
 }
 
-export default LichessGamePlayer
+
+export default LichessGamePlayer;
