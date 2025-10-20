@@ -1,13 +1,32 @@
 
 .container {
     width: 500px;
+    gap : 0;
     margin: auto;  /* Center the board */
-    border-radius: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    
+    margin : 24px auto;
+}
+.shadow { 
+box-shadow: 0 10px 15px rgba(0,0,0,0.7);
+border-color: black;
+border: 2px solid black;
+ width: 700px;
+margin: auto;  /* Center the board */
+display: flex;
+justify-content: center;
+align-items: center;
+position:relative;
+ 
+}
+ .board-wrapper {
+  /* change these to control board dimensions */
+  width: 500px;   /* board width in px */
+  height: 500px;  /* keeps square area available */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .player
 {
@@ -69,15 +88,28 @@
   
   
 }
+.button-one{
+  justify-content: center;
+   width: auto;          /* Let width adjust to content */
+  height: auto;  
+  position: relative;
+  top:75%;
+  left:7%;
+   font-size: 10px; 
+  background-color: black;
+  color:cyan
+}
 .eval-row
 {
   display:flex;
   align-items:center;
   gap:16px;
 }
-.two{
-  justify-content: center;
-  align-items:center
+.two {
+  display: flex;
+  align-items: center;
+  margin-left: 0;
+  padding-left: 0;
 }
 .celeb
 {

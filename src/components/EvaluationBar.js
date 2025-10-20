@@ -12,7 +12,7 @@ const revpercent = 100-percent;
       borderWidth: '5px',
       borderStyle: 'solid',
       position: 'relative',
-      marginLeft: '16px'
+      
     }}>
       
       <div style = {{

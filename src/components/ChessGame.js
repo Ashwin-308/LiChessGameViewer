@@ -5,6 +5,8 @@ import {useParams} from 'react-router-dom';
 import EvaluationBar from "./EvaluationBar";
 import GameTracker from "../GameTracker";
 import Celebrations from "../Celebrations";
+import Mychart from "../Mychart";
+import { useNavigate } from "react-router-dom";
 function LichessGamePlayer() {
   const {username} = useParams();
   const [game, setGame] = useState(new Chess());
@@ -18,9 +20,12 @@ function LichessGamePlayer() {
   const [prevcolor,setprecolor] = useState();
   const [compbg,setcompbg] = useState("aliceblue");
   const [arrows, setArrows] = useState([ ["",""]]);
+  const [board,setboard] = useState("white");
+  const [evaldata,seteval] = useState(null);  
+  const [evaluations, setEvaluations] = useState([]);
+  
  
-const [evaldata,seteval] = useState(null);  
-
+  const navigate = useNavigate();
 
   const fetchGame = async () => {
     try {
@@ -67,6 +72,14 @@ const [evaldata,seteval] = useState(null);
       return null;
     }
   };
+  const gotochart = () => {
+   
+    navigate("/chart",{state:{evaluation:evaluations}});
+  };
+  const flipboard = (board) => {
+    const newboard = board === "white" ? "black" : "white";
+    setboard(newboard);
+  }
  const changeBg = (color) => {
   const bgcolor = color=="white"? "#1e0e2a":"white";
    setbg(bgcolor);
@@ -142,20 +155,33 @@ const [evaldata,seteval] = useState(null);
       default: return "Error";
     }
   };
-  const fetcheval = async (fen) => {
+  
+
+
+   const fetcheval = async (fen) => {
       try {
         const response = await fetch(`https://stockfish.online/api/s/v2.php?fen=${encodeURIComponent(fen)}&depth=15`);
         if (!response.ok) throw new Error("Failed to fetch evaluation");
         const evaldata = await response.json();
         seteval(evaldata);
         console.log(evaldata);
+        if (evaldata?.evaluation !== undefined && evaldata?.evaluation !== null) {
+      const parsed = evaldata?.evaluation;
+      if (!isNaN(parsed)) {
+        setEvaluations((prev) => [...prev, parsed]); 
+      }
+    }
+    console.log("Evaluations Array:", evaluations);
       console.log("Evaluation Data:", evaldata);
     }catch(error)
     {
       console.error("Error fetching evaluation:", error);
     }
   };
-        
+
+
+   
+
  const gottomove = (moveIndex) => {
   const chess = new Chess();
   for(let i = 0;i<moveIndex;i++)
@@ -170,21 +196,22 @@ const [evaldata,seteval] = useState(null);
   setGame(chess);
   fetcheval(chess.fen());
   setCurrentMove(moveIndex);
+  
 };
 const changecompbg =  (color) => {
   const compbgcolor = color =="white" ?"#62b78e":"aliceblue";
   setcompbg(compbgcolor);
 
 }
-// Whenever evaluation updates, set an arrow
+
+
 useEffect(() => {
   let start = null;
   let end = null;
   let str = "";
-  if(evaldata){
+  if(evaldata?.bestmove !== undefined){
    str = evaldata?.bestmove.split(' ')[1];
   }
-  
   
   if (evaldata?.bestmove && str != undefined) {
     
@@ -202,7 +229,6 @@ useEffect(() => {
   return (
 
     <div style = {{backgroundColor:bg}} className = "celeb" >
-      
       <div>
       {playerInfo && (
         <div >
@@ -223,28 +249,32 @@ useEffect(() => {
       <div className = "one" style = {{backgroundColor:compbg}}>
           <div className = "eval-row">
         <GameTracker isOn = {showeval} onToggle = {setshoweval}/>{showeval ? "Hide Evaluation" : "Show Evaluation"}
-        {showeval && (<p>Evaluation : {evaldata ?.evaluation}</p>)}
+        {showeval && (<p>Evaluation : {evaldata != null?evaldata?.evaluation:"M"+evaldata ?.mate}</p>)}
         </div>
       </div>
       <div><Celebrations isstatus = {gameStatus}/></div>
       
          <div className = "container">
-        <Chessboard
+          <div className =  "board-wrapper">
+           <div className = "shadow">
+            <Chessboard
           position={game.fen()}
           customArrows = {arrows}
-          
+          boardOrientation = {board}
          />
-    
-        <div className = "two" style = {{color:bg === "white"?"black":"yellow"}}> <EvaluationBar value={parseFloat(evaldata?.evaluation)} /></div>
-        
-      </div>
-      
-            <Celebrations isstatus={gameStatus} />
+          </div>
+          </div>
+          
+          <div className = "two" style = {{color:bg === "white"?"black":"yellow"}}> <EvaluationBar value={parseFloat(evaldata?.evaluation)} /></div>
+           <button className = "button-one" onClick = {() => flipboard(board)}>Flip Board</button>
+         </div>
+          <Celebrations isstatus={gameStatus} />
                     
         <div className = "button-row">
       <button className = "button"onClick={() => gottomove(currentMove-1)} disabled = {currentMove === 0}>Previous Move</button>
       <button className = "button"onClick={() => gottomove(currentMove+1)} disabled = {currentMove >= moves.length}>Next Move</button>
       <button className = "button" onClick = {() => changeBg(bg)}>Change Background</button>
+      <button className = "button" onClick = {gotochart}>Chart</button>
       </div>
       
       
