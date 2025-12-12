@@ -23,7 +23,7 @@ function LichessGamePlayer() {
   const [board,setboard] = useState("white");
   const [evaldata,seteval] = useState(null);  
   const [evaluations, setEvaluations] = useState([]);
-  
+  const [moveslen,setmoveslen] = useState(0);
  
   const navigate = useNavigate();
 
@@ -74,7 +74,8 @@ function LichessGamePlayer() {
   };
   const gotochart = () => {
    
-    navigate("/chart",{state:{evaluation:evaluations}});
+    navigate("/chart",{state:{evaluation:evaluations,movesarray:moves.length}});
+    
   };
   const flipboard = (board) => {
     const newboard = board === "white" ? "black" : "white";
@@ -96,7 +97,7 @@ function LichessGamePlayer() {
     }
   };
   
-  
+ console.log()
   useEffect(() => {
     fetchPlayerInfo();
     fetchGame();
@@ -109,40 +110,6 @@ function LichessGamePlayer() {
 
     return () => clearInterval(intervalId);
   }, [username, gameStatus]);
-
-  /*useEffect(() => {
-    if (gameStatus !== "started") return;
-
-    if (currentMove < moves.length) {
-      console.log("Current Move Index:", currentMove);
-      console.log("Moves in array:", moves.length);
-      const timer = setTimeout(() => {
-        setGame((prevGame) => {
-          const newGame = new Chess(prevGame.fen());
-          try {
-            newGame.move(moves[currentMove]);
-            fetcheval(newGame.fen());
-            return newGame;
-          } catch (error) {
-            console.error("Invalid move skipped:", moves[currentMove], error);
-            return prevGame;
-          }
-        });
-        setCurrentMove((prevMove) => prevMove + 1);
-      }, 0);
-  
-      return () => clearTimeout(timer);
-    } else {
-      const refreshTimer = setTimeout(() => {
-        setMoves([]);
-        setCurrentMove(0);
-      }, 0);
-      
-      return () => clearTimeout(refreshTimer);
-    }
-  }, [currentMove, moves, gameStatus]);*/
-
-   
 
  
   const formatGameStatus = (status) => {
@@ -160,19 +127,25 @@ function LichessGamePlayer() {
 
    const fetcheval = async (fen) => {
       try {
-        const response = await fetch(`https://stockfish.online/api/s/v2.php?fen=${encodeURIComponent(fen)}&depth=15`);
+        const response = await fetch("https://chess-api.com/v1", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({fen}),
+        });
         if (!response.ok) throw new Error("Failed to fetch evaluation");
         const evaldata = await response.json();
         seteval(evaldata);
         console.log(evaldata);
-        if (evaldata?.evaluation !== undefined && evaldata?.evaluation !== null) {
-      const parsed = evaldata?.evaluation;
+        if (evaldata?.eval !== undefined && evaldata?.eval !== null) {
+      const parsed = evaldata?.eval;
       if (!isNaN(parsed)) {
         setEvaluations((prev) => [...prev, parsed]); 
       }
     }
     console.log("Evaluations Array:", evaluations);
-      console.log("Evaluation Data:", evaldata);
+    console.log("Evaluation Data:", evaldata);
     }catch(error)
     {
       console.error("Error fetching evaluation:", error);
@@ -194,6 +167,7 @@ function LichessGamePlayer() {
     }
   }
   setGame(chess);
+  console.log("Moves Length",moves.length);
   fetcheval(chess.fen());
   setCurrentMove(moveIndex);
   
@@ -209,14 +183,14 @@ useEffect(() => {
   let start = null;
   let end = null;
   let str = "";
-  if(evaldata?.bestmove !== undefined){
-   str = evaldata?.bestmove.split(' ')[1];
+  if(evaldata?.text !== undefined){
+   str = evaldata?.text.split(' ');
   }
   
-  if (evaldata?.bestmove && str != undefined) {
+  if (evaldata?.text && str != undefined) {
     
-      start = str.slice(0, 2); 
-      end = str.slice(2, 4); 
+      start = str[1]; 
+      end = str[3]; 
     
     setArrows([[start, end]]); 
   }
@@ -249,7 +223,7 @@ useEffect(() => {
       <div className = "one" style = {{backgroundColor:compbg}}>
           <div className = "eval-row">
         <GameTracker isOn = {showeval} onToggle = {setshoweval}/>{showeval ? "Hide Evaluation" : "Show Evaluation"}
-        {showeval && (<p>Evaluation : {evaldata != null?evaldata?.evaluation:"M"+evaldata ?.mate}</p>)}
+        {showeval && (<p>Evaluation : {evaldata?.eval != null?evaldata?.eval:(evaldata?.mate != null?evaldata.mate:null)}</p>)}
         </div>
       </div>
       <div><Celebrations isstatus = {gameStatus}/></div>
@@ -265,7 +239,7 @@ useEffect(() => {
           </div>
           </div>
           
-          <div className = "two" style = {{color:bg === "white"?"black":"yellow"}}> <EvaluationBar value={parseFloat(evaldata?.evaluation)} /></div>
+          <div className = "two" style = {{color:bg === "white"?"black":"yellow"}}> <EvaluationBar value={parseFloat(evaldata?.eval)} /></div>
            <button className = "button-one" onClick = {() => flipboard(board)}>Flip Board</button>
          </div>
           <Celebrations isstatus={gameStatus} />

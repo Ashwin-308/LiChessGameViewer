@@ -16,11 +16,11 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 export default function Mychart() {
   const location = useLocation();
-  
-  const {evaluation} = location.state || {evaluation: []}; 
+  const {evaluation = [],movesarray = []} = location.state || {}; 
   console.log("All evaluations so far:", evaluation);
+  console.log("Moves array:", movesarray);
   const data = {
-    labels: Array.from({ length: evaluation.length }, (_, i) => i + 1), // move numbers 1, 2, 3, ...
+    labels: Array.from({ length: movesarray}, (_, i) => i + 1),
     datasets: [
       {
         label: "Evaluation",
