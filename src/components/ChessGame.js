@@ -24,6 +24,7 @@ function LichessGamePlayer() {
   const [evaldata,seteval] = useState(null);  
   const [evaluations, setEvaluations] = useState([]);
   const [moveslen,setmoveslen] = useState(0);
+  const [s,setstr] = useState("");
  
   const navigate = useNavigate();
 
@@ -178,7 +179,10 @@ const changecompbg =  (color) => {
 
 }
 
-
+useEffect(() => {
+ const s= evaldata?.continuationArr?.slice(0,5).join(' ');
+ setstr(s);
+})
 useEffect(() => {
   let start = null;
   let end = null;
@@ -212,7 +216,7 @@ useEffect(() => {
           <p className = "one" style = {{backgroundColor:compbg}}>Games Played: {playerInfo?.count?.all || "N/A"}</p>
           <p className = "one" style = {{backgroundColor:compbg}}>Opening : {op}</p>
           
-          <p className = "one" style = {{backgroundColor:compbg}}>Best Continuation :{evaldata?.bestmove}</p>
+          <p className = "one" style = {{backgroundColor:compbg}}>Best Continuation :{s}</p>
           
         </div>
       )}
