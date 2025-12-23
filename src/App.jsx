@@ -6,7 +6,7 @@ import GameTracker from './GameTracker';
 import { useState, useEffect } from "react";
 import Test from './Test';
 import Mychart from './Mychart';
-
+import Analysis from './components/Analysis';
 function App()
 {
   
@@ -18,6 +18,7 @@ function App()
         <Route path =  "/game/:username" element = {<ChessGame  />}/> 
         <Route path = "/usergames/:gameId" element = {<Usergames />}/>
         <Route path = "/chart/" element = {<Mychart />}/>
+        <Route path = "/analyze/" element = {<Analysis />}/>
       </Routes>
     </Router>
       

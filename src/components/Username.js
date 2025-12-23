@@ -5,6 +5,7 @@ function UsernameForm({ setUsername }) {
     const [inputValue, setInputValue] = useState('');
     const [username,setusername] = useState('');
     const [gameId,setgameId] = useState('');
+    const [analyze,setanalyze] = useState('');
     const navigate = useNavigate();
   
     const handleSubmit = (e) => {
@@ -15,6 +16,16 @@ function UsernameForm({ setUsername }) {
     const handleGameIdSubmit = (e) => {
       e.preventDefault();
       navigate(`/usergames/${gameId}`)
+    }
+    const handleanalyzesubmit = (e) => {
+      e.preventDefault();
+      navigate("/analyze", {
+       state: {
+        evaluation: [],  
+        movesarray: []
+            }
+        });
+      
     }
    
     return (
@@ -45,11 +56,13 @@ function UsernameForm({ setUsername }) {
             />
             <button type="submit" className = "button" >View Game</button>
           </form></div>
-          
+          <div style = {{marginTop:"70px"}}></div>  
+         <div><form onSubmit = {handleanalyzesubmit} className = "form-container">
+          <h1 className = "style">Analyze your game</h1>
+          <button type = "submit" className = "button" onClick = {(e) =>setanalyze(e.target.value)}>Analyze</button>
+          </form></div>
         </div>
       );
       
   }
   export default UsernameForm;
-
-

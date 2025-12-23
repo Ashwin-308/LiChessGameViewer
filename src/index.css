@@ -1,4 +1,13 @@
+/* ./src/index.css */
 
+/* ./src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* You can add your own custom styles below this */
+/* You can add your own custom styles below this */
 .container {
     width: 500px;
     gap : 0;
@@ -125,3 +134,10 @@ position:relative;
   z-index: 9999;         /* make sure it’s on top of everything */
   pointer-events: none;  /* clicks pass through (optional) */
 }
+.textbox-style {
+  position:relative;
+  height: 200px;
+  width: 700px;
+    /* clicks pass through (optional) */
+}
+

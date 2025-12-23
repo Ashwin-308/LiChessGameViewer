@@ -5,6 +5,8 @@ import {useParams} from 'react-router-dom';
 import EvaluationBar from "./EvaluationBar";
 import GameTracker from "../GameTracker";
 import Celebrations from "../Celebrations";
+import { useMemo } from "react";
+
 import Mychart from "../Mychart";
 import { useNavigate } from "react-router-dom";
 function LichessGamePlayer() {
@@ -24,7 +26,8 @@ function LichessGamePlayer() {
   const [evaldata,seteval] = useState(null);  
   const [evaluations, setEvaluations] = useState([]);
   const [moveslen,setmoveslen] = useState(0);
-  const [s,setstr] = useState("");
+  const [s,setstr] = useState([]);
+  const [trigger,settrigger] = useState(false);
  
   const navigate = useNavigate();
 
@@ -75,7 +78,7 @@ function LichessGamePlayer() {
   };
   const gotochart = () => {
    
-    navigate("/chart",{state:{evaluation:evaluations,movesarray:moves.length}});
+    navigate("/chart",{state:{evaluation:evaluations,movesarray:moves}});
     
   };
   const flipboard = (board) => {
@@ -180,8 +183,8 @@ const changecompbg =  (color) => {
 }
 
 useEffect(() => {
- const s= evaldata?.continuationArr?.slice(0,5).join(' ');
- setstr(s);
+  const s= evaldata?.continuationArr?.slice(0,5).join(' ');
+  setstr(s);
 })
 useEffect(() => {
   let start = null;
@@ -215,7 +218,6 @@ useEffect(() => {
           <p className = "one" style = {{backgroundColor:compbg}}> Bullet Rating: {playerInfo?.perfs?.bullet?.rating || "N/A"}</p>
           <p className = "one" style = {{backgroundColor:compbg}}>Games Played: {playerInfo?.count?.all || "N/A"}</p>
           <p className = "one" style = {{backgroundColor:compbg}}>Opening : {op}</p>
-          
           <p className = "one" style = {{backgroundColor:compbg}}>Best Continuation :{s}</p>
           
         </div>

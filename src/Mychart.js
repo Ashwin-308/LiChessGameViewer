@@ -14,13 +14,18 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-export default function Mychart() {
+export default function Mychart({evaluation: propsEval, movesarray: propsMovesArray}) {
+
   const location = useLocation();
-  const {evaluation = [],movesarray = []} = location.state || {}; 
-  console.log("All evaluations so far:", evaluation);
-  console.log("Moves array:", movesarray);
+  console.log("propsEval",propsEval);
+  const evaluation = propsEval  || location.state?.evaluation;
+  const movesarray =  propsMovesArray || location.state?.movesarray;
+  console.log("MovesArray:", movesarray);
+ console.log("evaluation", evaluation);
+ 
+ 
   const data = {
-    labels: Array.from({ length: movesarray}, (_, i) => i + 1),
+    labels: Array.from({ length: movesarray.length}, (_, i) => i + 1),
     datasets: [
       {
         label: "Evaluation",
@@ -42,7 +47,7 @@ export default function Mychart() {
       title: { display: true, text: "Evaluation Graph" },
     },
     scales: {
-      y: { min :-20,max:20, title: { display: true, text: "Evaluation" } },
+      y: { min :-10,max:10, title: { display: true, text: "Evaluation" } },
       x: { title: { display: true, text: "Move Number" } },
     },
   };
